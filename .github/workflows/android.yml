@@ -20,13 +20,10 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Setup Gradle (Force Gradle 6.9.3)
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '6.9.3'
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        env:
+          SKIP_JDK_VERSION_CHECK: true
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
@@ -37,6 +34,11 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Setup Gradle (Force Gradle 6.9.3)
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '6.9.3'
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace

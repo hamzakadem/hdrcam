@@ -3,9 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch: # يتيح لك تشغيل البناء يدوياً في أي وقت
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,19 +21,19 @@ jobs:
 
     - name: Setup Android SDK & NDK 21
       uses: android-actions/setup-android@v3
-      with:
-        cmdline-tools-version: 'latest'
 
-    - name: Install Specific SDK 29 & NDK 21.4.7075588
+    - name: Install SDK 29 and Tools
       run: |
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-29" "build-tools;29.0.3" "ndk;21.4.7075588"
+        yes | sdkmanager --licenses
+        sdkmanager "platforms;android-29" "build-tools;29.0.3" "ndk;21.4.7075588"
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDebug -Pandroid.defaults.buildfeatures.renderscript.enable=true
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-android.outputs.ndk-path }}
 
     - name: Upload Generated APK
       uses: actions/upload-artifact@v4
